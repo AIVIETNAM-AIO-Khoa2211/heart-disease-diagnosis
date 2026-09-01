@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Raw / processed data (not tracked; folder structure kept via .gitkeep)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Trained model artifacts (large files, not tracked)
+models/*
+!models/.gitkeep
+*.pkl
+*.joblib
+*.h5
+*.pt
+
+# Generated experiment results (regenerate by re-running notebooks)
+results/tables/*
+!results/tables/.gitkeep
+results/figures/*
+!results/figures/.gitkeep
+
+# Temporary files
+*.tmp
+*.log
+*.bak

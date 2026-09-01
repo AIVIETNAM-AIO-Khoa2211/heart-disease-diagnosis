@@ -12,7 +12,9 @@ heart-disease-diagnosis/
 ├── data/
 │   ├── README.md
 │   ├── raw/
-│   └── processed/
+│   ├── engineered/
+│   ├── raw_reduced/
+│   └── engineered_reduced/
 ├── notebooks/
 │   ├── README.md
 │   ├── 01_data_exploration.ipynb

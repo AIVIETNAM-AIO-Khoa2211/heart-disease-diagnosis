@@ -57,3 +57,4 @@ def scale_data(
     test_scaled = preprocessor.transform(test_df)
 
     return train_scaled, val_scaled, test_scaled
+

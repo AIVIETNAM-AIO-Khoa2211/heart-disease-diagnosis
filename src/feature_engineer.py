@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from src.config import NUMERIC_COLS, CATEGORICAL_COLS, COLS
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -21,6 +22,8 @@ class AddNewFeaturesTransformer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         X = X.copy()
+        self.feature_names_in_ = list(X.columns)
+
         age_val = pd.to_numeric(X["age"], errors="coerce").dropna()
 
         # pd.qcut splits the ages into n_age_bins groups that each contain
@@ -68,8 +71,8 @@ class AddNewFeaturesTransformer(BaseEstimator, TransformerMixin):
         return df
 
     def get_feature_names_out(self, input_features=None):
-        # This tells sklearn what to call the output columns. Needed so
-        # .set_output(transform="pandas") can label the result correctly.
+        if input_features is None:
+            input_features = self.feature_names_in_   # lấy tên cột đã lưu lúc fit()
         return list(input_features) + [
             "chol_per_age",
             "bps_per_age",
@@ -86,11 +89,11 @@ def build_pipeline(num_cols, cate_cols, n_age_bin = 5):
     all_categorical_cols = cate_cols + new_cate_cols
 
     num_pipeline = Pipeline([
-        ("impute_missing", SimpleImputer(strategy="median"))
+        ("impute_missing", SimpleImputer(strategy="median")),
         ("scale", StandardScaler())
     ])
     cate_pipeline = Pipeline([
-        ("impute_missing", SimpleImputer(strategy="most_frequent"))
+        ("impute_missing", SimpleImputer(strategy="most_frequent")),
         ("one_hot_encode", OneHotEncoder(handle_unknown="ignore",sparse_output=False))
     ])
 
@@ -111,8 +114,8 @@ def run_feature_engineering(
     X_val,
     X_test,
     y_train,
-    numeric_cols,
-    categorical_cols,
+    numeric_cols = NUMERIC_COLS,
+    categorical_cols = CATEGORICAL_COLS,
     n_age_bins=5,
     drop_constant_cols=True,
 ):
@@ -138,9 +141,9 @@ def run_feature_engineering(
                it later, e.g. to transform new data or save it with pickle)
     """
     pipeline = build_pipeline(
-        numeric_cols=numeric_cols,
-        categorical_cols=categorical_cols,
-        n_age_bins=n_age_bins,
+        num_cols=numeric_cols,
+        cate_cols=categorical_cols,
+        n_age_bin=n_age_bins,
     )
  
     # Important: fit_transform is called ONLY on training data.
@@ -158,3 +161,24 @@ def run_feature_engineering(
     print("Number of features after feature engineering:", Xt_train.shape[1])
  
     return Xt_train, Xt_val, Xt_test, pipeline
+
+def get_fe_cate_col(pipeline: Pipeline
+                    , raw_cate_cols: list = CATEGORICAL_COLS + ["age_bin"]):
+    """
+    Return all categorical columns after feature engineer 
+    that will use in MI function.
+    """
+    ohe = (
+        pipeline.named_steps["preprocess"]
+        .named_transformers_["categorical"]
+        .named_steps["one_hot_encode"]
+    )
+    cate_names = list(ohe.get_feature_names_out(raw_cate_cols))
+    return cate_names
+
+def is_column_discrete(columns, encoded_categorical_cols):
+    """
+    Return T/F list to inform each cols is cate or not.
+    """
+    encoded_set = set(encoded_categorical_cols)
+    return np.array([c in encoded_set for c in columns], dtype=bool)

@@ -34,12 +34,12 @@ Thumbs.db
 # Raw / processed data (not tracked; folder structure kept via .gitkeep)
 data/raw/*
 !data/raw/.gitkeep
-data/engineerd/*
-!data/engineerd/.gitkeep
+data/engineered/*
+!data/engineered/.gitkeep
 data/raw_reduced/*
 !data/raw_reduced/.gitkeep
-data/engineerd_reduced/*
-!data/engineerd_reduced/.gitkeep
+data/engineered_reduced/*
+!data/engineered_reduced/.gitkeep
 
 
 # Trained model artifacts (large files, not tracked)
